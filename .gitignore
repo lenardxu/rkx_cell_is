@@ -16,8 +16,11 @@ wp-content/themes/twenty*/
 
 # ignore node dependency directories
 node_modules/
+.idea/
 
 # ignore log files and databases
+*.ckpt
 *.log
 *.sql
 *.sqlite
+.ipynb_checkpoints
