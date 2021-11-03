@@ -25,3 +25,17 @@ at the top of [COCO competition](https://paperswithcode.com/sota/instance-segmen
 + [Paper 2](References/CBNetV2%20-%20A%20Composite%20Backbone%20Network%20Architecture%20for%20Object%20Detection.pdf)
 + [Paper 3](References/Focal%20Self-attention%20for%20Local-Global%20Interactions%20in%20Vision%20Transformers.pdf)
 + [Paper 4](References/Swin%20Transformer%20-%20Hierarchical%20Vision%20Transformer%20using%20Shifted%20Windows.pdf)
+
+## Investigation on data
+### Cell Morphology
+![PCA results of commonly used morphological metrics](References/morphological_diversity_of_cell_types.PNG)
+
+- **BV-2**: small and round
+- **SK-OV-3**: large and flat
+- **SH-SY5Y**: neuronal-like
+  
+## Others
+- [ ] Read through the LIVECell paper and code
+
+### Differences between YOLO and R-CNN
+- Performance over small and dense objects
