@@ -5,10 +5,11 @@ IF python is not installed on current OS, issue the following commands in termin
 2. `ls /usr/bin/python*` (check if python3.8 is successfully installed)
 
 OTHERWISE (by checking it with `python -V`), ignore the commands above and issue the following commands
-3. `pip3 install virtualenv`
-4. `python -m virtualenv -p python3.8 .env` (if you've installed python3.8; if operated in Linux, python3 may be necessary.)
-5. `source .env/bin/activate` (on Linux or Mac) or `.env\Scripts\activate.bat` (on Win)
-6. `deactivate` (when quitting)
+
+1. `pip3 install virtualenv`
+2. `python -m virtualenv -p python3.8 .env` (if you've installed python3.8; if operated in Linux, python3 may be necessary.)
+3. `source .env/bin/activate` (on Linux or Mac) or `.env\Scripts\activate.bat` (on Win)
+4. `deactivate` (when quitting)
 
 ## Others
 ### Check CUDA version (cross-platform applicable)
