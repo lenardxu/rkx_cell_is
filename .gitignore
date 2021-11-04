@@ -18,7 +18,7 @@ wp-content/themes/twenty*/
 node_modules/
 .idea/
 .env/
-data/
+dataset/
 
 # ignore log files and databases
 *.ckpt
