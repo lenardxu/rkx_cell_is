@@ -7,10 +7,12 @@ This serves as a private repo for the [sartorious cell instance segmentation com
 - Variant 1 - modeling and training: transfer learning of state-of-the-art model trained on COCO, from on LIVECell to the 
   current dataset for the competition
   
-- Variant 1 - modeling and training: transfer learning of the LIVECell-based models with adaptations on the current dataset 
+- Variant 2 - modeling and training: transfer learning of the LIVECell-based models with adaptations on the current dataset 
   for the competition 
 
 ## Data exploration
+### Data validity check
+- 
 
 ## Evaluation
 
@@ -20,14 +22,15 @@ A clear project structure helps us in collaboration and automation of tasks like
 
 ### Folders
 
+* `analytics`: contains all the Jupyter notebooks.
 * `code`: contains python top-level package of the source code including the code of the experiments.
-  * `analytics`: contains all the Jupyter notebooks.
   * `data`: contains code for preprocessing.
   * `experiments`: contains the experiment code.
   * `model`: contains the code for modeling.
   * `utils`: contains the helper code.
-* `data`: contains both LIVECell and the dataset for competition, not synchronized with remote repo.
-* `docs`: contains the references.
+* `dataset`: contains both LIVECell dataset and the dataset for competition (currently not synchronized with remote repo 
+  for its size).
+* `docs`: contains the references and summaries.
 * `Install`: contains instruction of configuring the virtual environment based on pip3.
 * `results`: contains the results of the experiments.
 
