@@ -16,4 +16,12 @@ OTHERWISE (by checking it with `python -V`), ignore the commands above and issue
 - `nvidia-smi` - This driver API
 - `nvcc --version` - This runtime API reports the CUDA runtime version, which actually reflects your expectation.
 
-The difference between them see [this link](https://stackoverflow.com/questions/53422407/different-cuda-versions-shown-by-nvcc-and-nvidia-smi).
+The difference between them see 
+[this link](https://stackoverflow.com/questions/53422407/different-cuda-versions-shown-by-nvcc-and-nvidia-smi).
+
+### Shortcut keys for convenience in coding
+Helpful [links](https://www.pythonforbeginners.com/comments/shortcut-to-comment-out-multiple-lines-in-python) to 
+shortcuts for commenting out in different IDEs.
+
+- In Pycharm, press `ctrl+shift+/` to comment out multiple lines.
+- In Jupyter Notebook, press `ctrl+/` to comment out multiple lines.
