@@ -22,7 +22,14 @@ at the top of [COCO competition](https://paperswithcode.com/sota/instance-segmen
 + [Paper 3](Focal%20Self-attention%20for%20Local-Global%20Interactions%20in%20Vision%20Transformers.pdf)
 + [Paper 4](Swin%20Transformer%20-%20Hierarchical%20Vision%20Transformer%20using%20Shifted%20Windows.pdf)
 
+### COCO dataset
 
+- Download links to COCO dataset and its surroudings: https://cocodataset.org/#download
+- Meaning of *iscrowd's values*: 0 if your segmentation based on polygon (object instance, or say, the instance 
+represents a single object); 1 if your segmentation based uncompressed RLE (crowd, or say, the instance represents a 
+collection of objects). **RLE** is abbreviated for run length encoding representations. Hers is 
+[Useful links](https://stackoverflow.com/questions/49494337/encode-numpy-array-using-uncompressed-rle-for-coco-dataset).
+- 
 ## LIVECell: Data exploration
 ### Characters of LIVECell dataset
 - It offers a robust dataset for pretraining before fine-tuning on small datasets due to its size, morphological diversity
