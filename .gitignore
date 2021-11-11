@@ -19,6 +19,7 @@ node_modules/
 .idea/
 .env/
 dataset/
+__pycache__/
 
 # ignore log files and databases
 *.ckpt
