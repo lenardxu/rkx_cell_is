@@ -18,6 +18,8 @@ wp-content/themes/twenty*/
 node_modules/
 .idea/
 .env/
+env/
+venv/
 dataset/
 __pycache__/
 

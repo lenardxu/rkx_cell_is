@@ -15,12 +15,15 @@ The link to the [code](https://github.com/sartorius-research/LIVECell).
 The following papers are new breakthroughs in DLCV, which are based on the new backbone and now rank
 at the top of [COCO competition](https://paperswithcode.com/sota/instance-segmentation-on-coco).
 
-+ **[Paper 1](End-to-End%20Semi-Supervised%20Object%20Detection%20with%20Soft%20Teacher.pdf)** ranks the 1st 
+> **[Paper 1](End-to-End%20Semi-Supervised%20Object%20Detection%20with%20Soft%20Teacher.pdf)**: ranks the 1st 
   (multi-scale) and the 2nd (single-scale)
-+ **[Paper 2](CBNetV2%20-%20A%20Composite%20Backbone%20Network%20Architecture%20for%20Object%20Detection.pdf)**
-  ranks the 3rd (multi-scale) and the 4th (single-scale)
-+ [Paper 3](Focal%20Self-attention%20for%20Local-Global%20Interactions%20in%20Vision%20Transformers.pdf)
-+ [Paper 4](Swin%20Transformer%20-%20Hierarchical%20Vision%20Transformer%20using%20Shifted%20Windows.pdf)
+
+> **[Paper 2](CBNetV2%20-%20A%20Composite%20Backbone%20Network%20Architecture%20for%20Object%20Detection.pdf)**
+  : ranks the 3rd (multi-scale) and the 4th (single-scale)
+
+> [Paper 3](Focal%20Self-attention%20for%20Local-Global%20Interactions%20in%20Vision%20Transformers.pdf):
+
+> [Paper 4](Swin%20Transformer%20-%20Hierarchical%20Vision%20Transformer%20using%20Shifted%20Windows.pdf):
 
 ### COCO dataset
 
