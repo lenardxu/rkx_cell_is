@@ -20,6 +20,9 @@ __C.TRAIN.WIDTH = 520
 __C.TRAIN.HEIGTH = 704
 __C.TRAIN.SHAPE = (520, 704)
 
+# Learning rate of training
+__C.TRAIN.LEARNING_RATE = 0.001
+
 # Cell-Type
 __C.TRAIN.CELL_TYPE = ['A172', 'BT474', 'BV2', 'Huh7', 'MCF7', 'RatC6', 'SHSY5Y', 'SkBr3', 'SKOV3']
 
@@ -42,4 +45,12 @@ __C.PATH.LIVE_TEST_IMAGES = os.path.join(__C.PATH.LIVE_ROOT, 'livecell_test_imag
 __C.PATH.LIVE_TRAIN_JSON = os.path.join(__C.PATH.LIVE_ROOT, 'annotations/LIVECell/livecell_coco_train.json')
 __C.PATH.LIVE_VAL_JSON = os.path.join(__C.PATH.LIVE_ROOT, 'annotations/LIVECell/livecell_coco_val.json')
 __C.PATH.LIVE_TEST_JSON = os.path.join(__C.PATH.LIVE_ROOT, 'annotations/LIVECell/livecell_coco_test.json')
+
+# Parameters about anchor
+__C.ANCHOR_RATIOS = [0.5, 1, 2]
+__C.ANCHOR_SCALES = [8, 16, 32]
+__C.STRIDE = [16, ]
+
+
+
 
