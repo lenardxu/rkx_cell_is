@@ -212,8 +212,9 @@ if __name__ == '__main__':
         # print(dataset[k][1])
         # print('--------')
         # print(dataset[k][2], dataset[k][3], dataset[k][4])
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size,
-                                                 batch_sampler=batch_sampler, num_workers=args.num_workers)
+        dataloader = torch.utils.data.DataLoader(dataset,
+                                                 batch_sampler=batch_sampler,
+                                                 num_workers=args.num_workers)
 
 
         # validation set
@@ -229,10 +230,11 @@ if __name__ == '__main__':
         #       - no data augmentation is applied
         #       - only one (not two or more) image per batch (per gpu if any) for validation
         #       - shuffle is not adopted when distributed computing is off
-        val_dataset = roibatchLoader(val_roidb, val_ratio_list, val_ratio_index, args.batch_size,
-                                     val_imdb.num_classes, training=True)
-        val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=args.val_batch_size,
-                                                     sampler=val_batch_sampler, num_workers=args.num_workers)
+        val_dataset = roibatchLoader(val_roidb, val_ratio_list, val_ratio_index,
+                                     args.val_batch_size, val_imdb.num_classes, training=True)
+        val_dataloader = torch.utils.data.DataLoader(val_dataset,
+                                                     batch_sampler=val_batch_sampler,
+                                                     num_workers=args.num_workers)
     else:
         # set up the data preprocessing for anchor-free model
         pass
