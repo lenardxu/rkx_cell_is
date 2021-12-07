@@ -108,10 +108,11 @@ def combined_roidb(imdb_names, training=True):
 
     def get_training_roidb(imdb):
         """Returns a roidb (Region of Interest database) for use in training."""
-        if cfg.TRAIN.USE_FLIPPED:
-            print('Appending horizontally-flipped training examples...')
-            imdb.append_flipped_images()
-            print('done')
+        # the following off-line image augmentation is deprecated, instead online one would be adopted.
+        # if cfg.TRAIN.USE_FLIPPED:
+        #     print('Appending horizontally-flipped training examples...')
+        #     imdb.append_flipped_images()
+        #     print('done')
 
         print('Preparing training data...')
 
@@ -135,6 +136,7 @@ def combined_roidb(imdb_names, training=True):
 
     # e.g., "coco_2014_train+coco_2014_valminusminival" or "livecell_coco_train"
     # XU: to return a list of lists of dicts or a list of a list of dicts if '+' is not included
+    print([s for s in imdb_names.split('+')])
     roidbs = [get_roidb(s) for s in imdb_names.split('+')]
     roidb = roidbs[0]
 
@@ -154,3 +156,15 @@ def combined_roidb(imdb_names, training=True):
     ratio_list, ratio_index = rank_roidb_ratio(roidb)
 
     return imdb, roidb, ratio_list, ratio_index
+
+if __name__ == '__main__':
+    ut_imdbval_name = "livecell_coco_val"
+    ut_imdb, ut_roidb, ut_ratio_list, ut_ratio_index = combined_roidb(ut_imdbval_name)
+    for k, j in enumerate(ut_ratio_index):
+        if j == 149:
+            print(k)
+            break
+    print('roidb', ut_roidb[149])
+    # print(dataset[k][1])
+    # print('--------')
+    # print(dataset[k][2], dataset[k][3], dataset[k][4])

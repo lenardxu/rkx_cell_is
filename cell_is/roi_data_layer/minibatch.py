@@ -18,13 +18,51 @@ from cell_is.model.utils.blob import prep_im_for_blob, im_list_to_blob
 import pdb
 
 
-def get_minibatch(roidb, num_classes):
+def get_minibatch(imdb, roidb, num_classes):
     """
     Given a roidb, construct a minibatch - blobs sampled from it.
     The returned blobs is a dict of keys - 'data', 'gt_boxes', 'im_info', 'img_id', 'gt_masks'
     """
     # XU: roidb is a list of a dict
     num_images = len(roidb)
+
+    # Build mask after filtering, of shape (height, width, instance_count)
+    # Adapt the other keys to be consistent
+    bboxes = []
+    instance_masks = []
+    gt_classes = []
+    overlaps = []
+    seg_areas = []
+    width = roidb[0]['width']
+    height = roidb[0]['height']
+    for ix, cls in enumerate(roidb[0]['gt_classes']):
+        obj = {'segmentation': roidb[0]['segmentation'][ix]}
+        m = imdb.annToMask(obj, height, width)
+        bbox = roidb[0]['boxes'][ix]
+        # Some objects are so small that they're less than 1 pixel area
+        # and end up rounded out. Skip those objects.
+        if m.max() < 1:
+            continue
+        # Is it a crowd? If so, use a negative class ID.
+        if np.allclose(roidb[0]['gt_overlaps'][ix], -1.0):
+            # Use negative class ID for crowds
+            cls *= -1
+            # For crowd masks, annToMask() sometimes returns a mask
+            # smaller than the given dimensions. If so, resize it.
+            if m.shape[0] != height or m.shape[1] != width:
+                m = np.ones((height, width), dtype=bool)
+        instance_masks.append(m)
+        bboxes.append(bbox)
+        gt_classes.append(cls)
+        overlaps.append(roidb[0]['gt_overlaps'][ix])
+        seg_areas.append(roidb[0]['area'][ix])
+    del roidb[0]['segmentation']
+    roidb[0]['boxes'] = np.stack(bboxes, axis=0).astype(np.uint16)
+    roidb[0]['mask'] = np.stack(instance_masks, axis=2).astype(np.bool)
+    roidb[0]['gt_classes'] = np.asarray(gt_classes, dtype=np.int32)
+    roidb[0]['gt_overlaps'] = np.stack(overlaps, axis=0).astype(np.float32)
+    roidb[0]['area'] = np.asarray(seg_areas, dtype=np.float32)
+
     # Sample random scales to use for each image in this batch
     # XU: return np.ndarray of shape (num_images,) with int number uniformly sampled from [0,len(cfg.TRAIN.SCALES))
     random_scale_inds = npr.randint(0, high=len(cfg.TRAIN.SCALES), size=num_images)
@@ -32,6 +70,12 @@ def get_minibatch(roidb, num_classes):
     assert(cfg.TRAIN.BATCH_SIZE % num_images == 0), \
         'num_images ({}) must divide BATCH_SIZE ({}) integerly'. \
         format(num_images, cfg.TRAIN.BATCH_SIZE)
+
+    # XU: Image Augmentation: get the bboxes and masks flipped accordingly if the image would be flipped
+    coin = npr.randint(0, 1, size=1, dtype=bool)[0]
+    if cfg.TRAIN.USE_FLIPPED:
+        if coin:
+            fliplr_image_annots(roidb[0])
 
     # Get the input image blob, formatted for caffe
     # XU: im_blob (np.ndarray) currently has the shape: (1, h, w, 3); im_scales: a list of only one float number
@@ -71,7 +115,8 @@ def get_minibatch(roidb, num_classes):
     return blobs
 
 def _get_image_blob(roidb, scale_inds):
-  """Builds an input blob from the image(s) in the roidb at the specified
+  """
+  Builds an input blob from the image(s) in the roidb at the specified
   scales. In our case, the number of images in the blob is now 1 (which
   can be extended to batch_size). So the blob's shape is (1, h, w, 3).
   """
@@ -123,3 +168,20 @@ def resize_mask(mask, scale, padding, crop=None):
     else:
         mask = np.pad(mask, padding, mode='constant', constant_values=0)
     return mask
+
+
+def fliplr_image_annots(roidb):
+    """
+    flip the annotations of the image along with the flipped image horizontally
+    :param roidb: dict the dict containing the annotations for the image
+    :return:
+    """
+    width = roidb['width']
+    boxes = roidb['boxes'].copy()
+    oldx1 = boxes[:, 0]
+    oldx2 = boxes[:, 2]
+    roidb['boxes'][:, 0] = width - oldx2 - 1
+    roidb['boxes'][:, 2] = width - oldx1 - 1
+    assert (roidb['boxes'][:, 2] >= roidb['boxes'][:, 0]).all()
+    roidb['mask'] = np.fliplr(roidb['mask'])
+    roidb['flipped'] = True

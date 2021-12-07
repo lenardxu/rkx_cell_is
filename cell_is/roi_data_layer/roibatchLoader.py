@@ -47,7 +47,8 @@ class sampler(Sampler):
 
 
 class roibatchLoader(data.Dataset):
-  def __init__(self, roidb, ratio_list, ratio_index, batch_size, num_classes, training=True, normalize=None):
+  def __init__(self, imdb, roidb, ratio_list, ratio_index, batch_size, num_classes, training=True, normalize=None):
+    self._imdb = imdb
     self._roidb = roidb
     self._num_classes = num_classes  # 2 in the case of livecell
     # we make the height of image consistent to trim_height, trim_width
@@ -97,7 +98,7 @@ class roibatchLoader(data.Dataset):
     # XU: return a list of a dict, the only dict being related with one image
     minibatch_db = [self._roidb[index_ratio]]
     # XU: return a dict of keys - ['data', 'gt_boxes', 'im_info', 'img_id', 'gt_masks'] and values - ...
-    blobs = get_minibatch(minibatch_db, self._num_classes)
+    blobs = get_minibatch(self._imdb, minibatch_db, self._num_classes)
     data = torch.from_numpy(blobs['data'])
     im_info = torch.from_numpy(blobs['im_info'])  # shape: (1,3)
     # we need to random shuffle the bounding box.

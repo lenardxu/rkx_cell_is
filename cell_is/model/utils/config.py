@@ -86,6 +86,11 @@ __C.TRAIN.FG_THRESH_3RD = 0.7
 __C.TRAIN.BG_THRESH_HI = 0.5
 __C.TRAIN.BG_THRESH_LO = 0.1
 
+# If enabled, resizes instance masks to a smaller size to reduce
+# memory load. Recommended when using high-resolution images.
+__C.USE_MINI_MASK = True
+__C.MINI_MASK_SHAPE = (65, 88)  # (height, width) of the mini-mask
+
 # Use horizontally-flipped images during training?
 __C.TRAIN.USE_FLIPPED = True
 

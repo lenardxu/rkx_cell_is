@@ -199,18 +199,10 @@ if __name__ == '__main__':
         batch_sampler = torch.utils.data.sampler.BatchSampler(
             single_batch_sampler, args.batch_size, drop_last=False
         )
-        # for k, j in enumerate(ratio_index):
-        #     if j == 23225:
-        #         print(k)
-        #         break
         # Currently, the args.batch_size does not work as expected, i.e. the single sample as batch is executed
         # no matter how much args.batch_size takes. Hence, the batch_sampler is inserted here for dataloader.
-        dataset = roibatchLoader(roidb, ratio_list, ratio_index, args.batch_size,
+        dataset = roibatchLoader(imdb, roidb, ratio_list, ratio_index, args.batch_size,
                                  imdb.num_classes, training=True)
-        # print('roidb', roidb[23225])
-        # print(dataset[k][1])
-        # print('--------')
-        # print(dataset[k][2], dataset[k][3], dataset[k][4])
         dataloader = torch.utils.data.DataLoader(dataset,
                                                  batch_sampler=batch_sampler,
                                                  num_workers=args.num_workers)
@@ -229,7 +221,7 @@ if __name__ == '__main__':
         #       - no data augmentation is applied
         #       - only one (not two or more) image per batch (per gpu if any) for validation
         #       - shuffle is not adopted when distributed computing is off
-        val_dataset = roibatchLoader(val_roidb, val_ratio_list, val_ratio_index,
+        val_dataset = roibatchLoader(val_imdb, val_roidb, val_ratio_list, val_ratio_index,
                                      args.val_batch_size, val_imdb.num_classes, training=True)
         val_dataloader = torch.utils.data.DataLoader(val_dataset,
                                                      batch_sampler=val_batch_sampler,
