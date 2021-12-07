@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 import os.path as osp
 import numpy as np
@@ -59,15 +55,17 @@ __C.TRAIN.SNAPSHOT_KEPT = 3
 __C.TRAIN.SUMMARY_INTERVAL = 180
 
 # Scale to use during training (can list multiple scales)
+# TODO (XU) can list multiple scales of images instead of the following only one presence
 # The scale is the pixel size of an image's shortest side
-__C.TRAIN.SCALES = (600,)
+__C.TRAIN.SCALES = (520,)
 
 # Max pixel size of the longest side of a scaled input image
+# TODO (XU) to understand its meaning and operate on it accordingly
 __C.TRAIN.MAX_SIZE = 1000
 
 # Trim size for input images to create minibatch
-__C.TRAIN.TRIM_HEIGHT = 600
-__C.TRAIN.TRIM_WIDTH = 600
+__C.TRAIN.TRIM_HEIGHT = 520
+__C.TRAIN.TRIM_WIDTH = 704
 
 # Images to use per minibatch
 __C.TRAIN.IMS_PER_BATCH = 1
@@ -169,7 +167,7 @@ __C.TEST = edict()
 
 # Scale to use during testing (can NOT list multiple scales)
 # The scale is the pixel size of an image's shortest side
-__C.TEST.SCALES = (600,)
+__C.TEST.SCALES = (520,)
 
 # Max pixel size of the longest side of a scaled input image
 __C.TEST.MAX_SIZE = 1000
@@ -287,7 +285,7 @@ __C.EPS = 1e-14
 __C.ROOT_DIR = osp.abspath(osp.join(osp.dirname(__file__), '..', '..', '..'))
 
 # Data directory
-__C.DATA_DIR = osp.abspath(osp.join(__C.ROOT_DIR, 'data'))
+__C.DATA_DIR = osp.abspath(osp.join(__C.ROOT_DIR, 'dataset'))
 
 # Name (or path to) the matlab executable
 __C.MATLAB = 'matlab'

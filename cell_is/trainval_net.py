@@ -201,7 +201,8 @@ if __name__ == '__main__':
         #         print(k)
         #         break
         # TODO (XU) to check the effectiveness of args.batch_size in batching the images and consider the batch_sampler
-        # Answer: Currently, the args.batch_size does not work as expected.
+        # Answer: Currently, the args.batch_size does not work as expected, i.e. the single sample as batch is executed
+        # no matter how much args.batch_size takes.
         dataset = roibatchLoader(roidb, ratio_list, ratio_index, args.batch_size,
                                  imdb.num_classes, training=True)
         # print('roidb', roidb[23225])
