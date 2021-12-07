@@ -203,9 +203,8 @@ if __name__ == '__main__':
         #     if j == 23225:
         #         print(k)
         #         break
-        # TODO (XU) to check the effectiveness of args.batch_size in batching the images and consider the batch_sampler
-        # Answer: Currently, the args.batch_size does not work as expected, i.e. the single sample as batch is executed
-        # no matter how much args.batch_size takes.
+        # Currently, the args.batch_size does not work as expected, i.e. the single sample as batch is executed
+        # no matter how much args.batch_size takes. Hence, the batch_sampler is inserted here for dataloader.
         dataset = roibatchLoader(roidb, ratio_list, ratio_index, args.batch_size,
                                  imdb.num_classes, training=True)
         # print('roidb', roidb[23225])
@@ -222,7 +221,7 @@ if __name__ == '__main__':
         val_imdb, val_roidb, val_ratio_list, val_ratio_index = combined_roidb(args.imdbval_name)
         val_size = len(val_roidb)
         _print('{:d} validation roidb entries'.format(val_size))
-        val_single_batch_sampler = sampler(val_size, args.batch_size)
+        val_single_batch_sampler = sampler(val_size, args.val_batch_size)
         val_batch_sampler = torch.utils.data.sampler.BatchSampler(
             val_single_batch_sampler, args.val_batch_size, drop_last=False
         )
