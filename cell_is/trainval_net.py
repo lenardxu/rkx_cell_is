@@ -188,14 +188,17 @@ if __name__ == '__main__':
         # train set
         # -- Note: Use validation set and disable the flipped to enable faster loading.
         # TODO (XU) to enable more image augmentations in the future, the load_image_gt() function can be referenced from:
-        # TODO (XU) https://github.com/matterport/Mask_RCNN/blob/3deaec5d902d16e1daf56b62d5971d428dc920bc/mrcnn/model.py
+        # https://github.com/matterport/Mask_RCNN/blob/3deaec5d902d16e1daf56b62d5971d428dc920bc/mrcnn/model.py
         cfg.TRAIN.USE_FLIPPED = True
         cfg.USE_GPU_NMS = args.cuda
 
         imdb, roidb, ratio_list, ratio_index = combined_roidb(args.imdb_name)
         train_size = len(roidb)
         _print('{:d} roidb entries'.format(train_size))
-        sampler_batch = sampler(train_size, args.batch_size)
+        single_batch_sampler = sampler(train_size, args.batch_size)
+        batch_sampler = torch.utils.data.sampler.BatchSampler(
+            single_batch_sampler, args.batch_size, drop_last=False
+        )
         # for k, j in enumerate(ratio_index):
         #     if j == 23225:
         #         print(k)
@@ -210,7 +213,7 @@ if __name__ == '__main__':
         # print('--------')
         # print(dataset[k][2], dataset[k][3], dataset[k][4])
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size,
-                                                 sampler=sampler_batch, num_workers=args.num_workers)
+                                                 batch_sampler=batch_sampler, num_workers=args.num_workers)
 
 
         # validation set
@@ -218,14 +221,18 @@ if __name__ == '__main__':
         val_imdb, val_roidb, val_ratio_list, val_ratio_index = combined_roidb(args.imdbval_name)
         val_size = len(val_roidb)
         _print('{:d} validation roidb entries'.format(val_size))
-        val_sampler_batch = sampler(val_size, args.batch_size)
+        val_single_batch_sampler = sampler(val_size, args.batch_size)
+        val_batch_sampler = torch.utils.data.sampler.BatchSampler(
+            val_single_batch_sampler, args.val_batch_size, drop_last=False
+        )
         # -- Note: training mode also applies to validation ds since num_gpu <=1, but
         #       - no data augmentation is applied
         #       - only one (not two or more) image per batch (per gpu if any) for validation
+        #       - shuffle is not adopted when distributed computing is off
         val_dataset = roibatchLoader(val_roidb, val_ratio_list, val_ratio_index, args.batch_size,
                                      val_imdb.num_classes, training=True)
         val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=args.val_batch_size,
-                                                 sampler=val_sampler_batch, num_workers=args.num_workers)
+                                                     sampler=val_batch_sampler, num_workers=args.num_workers)
     else:
         # set up the data preprocessing for anchor-free model
         pass
