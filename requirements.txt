@@ -48,6 +48,11 @@ torch==1.7.1+cu110
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torchvision==0.8.2+cu110
 
+# TensorBoard with Pytorch supported by third-party
+# This is an alternative to official TensorBoard, which may have the problem when TF and Pytorch are installed -> see:
+# https://blog.csdn.net/weixin_43002433/article/details/104167975
+tensorboardX
+
 # Optional
 # NOT AVAILABLE ON WINDOWS
 # tensorflow-addons==0.12.1
@@ -87,3 +92,8 @@ PyYAML
 
 # Optional
 pathlib2
+easydict
+
+# Optional
+cython
+cffi
