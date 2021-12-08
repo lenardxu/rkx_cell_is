@@ -10,8 +10,9 @@ from torch.autograd import Variable
 import torch.nn as nn
 import argparse
 import time
+import os
 
-from model.utils import adjust_learning_rate
+from model.utils import adjust_learning_rate, save_checkpoint
 from model.config import cfg
 
 def parse_args():
@@ -103,6 +104,12 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+def _print(str, logger=None):
+    print(str)
+    if logger is None:
+        return
+    logger.info(str)
+
 if __name__ == '__main__':
     args = parse_args()
     """
@@ -162,6 +169,20 @@ if __name__ == '__main__':
         optimizer = torch.optim.SGD(params, momentum=cfg.TRAIN.MOMENTUM)
     
     
+    if args.resume:
+        load_name = os.path.join(output_dir,
+                                 'model_{}_{}_{}.pth'.format(args.checksession, args.checkepoch, args.checkpoint))
+        _print("loading checkpoint %s" % (load_name), )
+        checkpoint = torch.load(load_name)
+        args.session = checkpoint['session']
+        args.start_epoch = checkpoint['epoch']
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        lr = optimizer.param_groups[0]['lr']
+        if 'pooling_mode' in checkpoint.keys():
+            cfg.POOLING_MODE = checkpoint['pooling_mode']
+        _print("loaded checkpoint %s" % (load_name), )
+    
     if args.mGPUs:
         model = nn.DataParallel(model)
 
@@ -203,17 +224,106 @@ if __name__ == '__main__':
             T = 3
             beta = 1
             alpha = [1, 0.5, 0.25]
-            loss_cls_lst, loss_reg_lst, loss_mask_lst, loss_seg = model(im_data, im_info, gt_boxes, num_boxes)
+            loss_cls_lst, loss_reg_lst, loss_mask_lst, loss_seg, roi_labels = model(im_data, im_info, gt_boxes, num_boxes)
             loss_sum = 0
             for i in range(T):
-                loss_sum += (alpha[i] * (loss_cls_lst[i] + loss_reg_lst[i] + loss_mask_lst[i]))
-            loss = loss_sum + beta * loss_seg
+                loss_sum += (alpha[i] * (loss_cls_lst[i].mean() + loss_reg_lst[i].mean() + loss_mask_lst[i].mean()))
+            loss = loss_sum + beta * loss_seg.mean()
             
         
         # backward
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        
+        
+        if step % args.disp_interval == 0:
+                end = time.time()
+                if step > 0:
+                    loss_temp /= args.disp_interval
+
+                if args.mGPUs:
+                    loss_cls_1 = loss_cls_lst[0].mean().data[0]
+                    loss_cls_2 = loss_cls_lst[1].mean().data[0]
+                    loss_cls_3 = loss_cls_lst[2].mean().data[0]
+                    
+                    loss_reg_1 = loss_reg_lst[0].mean().data[0]
+                    loss_reg_2 = loss_reg_lst[1].mean().data[0]
+                    loss_reg_3 = loss_reg_lst[2].mean().data[0]
+                    
+                    loss_mask_1 = loss_mask_lst[0].mean().data[0]
+                    loss_mask_2 = loss_mask_lst[1].mean().data[0]
+                    loss_mask_3 = loss_mask_lst[2].mean().data[0]
+                    
+                    loss_seg_ = loss_seg.mean().data[0]
+
+                    fg_cnt = torch.sum(roi_labels.data.ne(0))
+                    bg_cnt = roi_labels.data.numel() - fg_cnt
+                else:
+                    loss_cls_1 = loss_cls_lst[0].data[0]
+                    loss_cls_2 = loss_cls_lst[1].data[0]
+                    loss_cls_3 = loss_cls_lst[2].data[0]
+                    
+                    loss_reg_1 = loss_reg_lst[0].data[0]
+                    loss_reg_2 = loss_reg_lst[1].data[0]
+                    loss_reg_3 = loss_reg_lst[2].data[0]
+                    
+                    loss_mask_1 = loss_mask_lst[0].data[0]
+                    loss_mask_2 = loss_mask_lst[1].data[0]
+                    loss_mask_3 = loss_mask_lst[2].data[0]
+                    
+                    loss_seg_ = loss_seg.data[0]
+
+                    fg_cnt = torch.sum(roi_labels.data.ne(0))
+                    bg_cnt = roi_labels.data.numel() - fg_cnt
+
+                _print("[session %d][epoch %2d][iter %4d/%4d] loss: %.4f, lr: %.2e" \
+                       % (args.session, epoch, step, iters_per_epoch, loss_temp, lr), )
+                _print("\t\t\tfg/bg=(%d/%d), time cost: %f" % (fg_cnt, bg_cnt, end - start), )
+                '''
+                if args.cascade:
+                    _print("\t\t\trpn_cls: %.4f, rpn_box: %.4f, rcnn_cls: %.4f, rcnn_box %.4f, rcnn_cls_2nd: %.4f, "
+                           "rcnn_box_2nd %.4f, rcnn_cls_3rd: %.4f, rcnn_box_3rd %.4f" % (loss_rpn_cls, loss_rpn_box,
+                        loss_cls_1, loss_reg_1, loss_rcnn_cls_2nd, loss_rcnn_box_2nd, loss_rcnn_cls_3rd, loss_rcnn_box_3rd), )
+                else:
+                    _print("\t\t\trpn_cls: %.4f, rpn_box: %.4f, rcnn_cls: %.4f, rcnn_box %.4f" \
+                            % (loss_rpn_cls, loss_rpn_box, loss_rcnn_cls, loss_rcnn_box), )
+
+                if args.use_tfboard:
+                    if args.cascade:
+                        scalars = [loss_temp, loss_rpn_cls, loss_rpn_box, loss_rcnn_cls, loss_rcnn_box, loss_rcnn_cls_2nd, loss_rcnn_box_2nd, loss_rcnn_cls_3rd, loss_rcnn_box_3rd]
+                        names = ['loss', 'loss_rpn_cls', 'loss_rpn_box', 'loss_rcnn_cls', 'loss_rcnn_box', 'loss_rcnn_cls_2nd', 'loss_rcnn_box_2nd', 'loss_rcnn_cls_3rd', 'loss_rcnn_box_3rd']
+                    else:
+                        scalars = [loss_temp, loss_rpn_cls, loss_rpn_box, loss_rcnn_cls, loss_rcnn_box]
+                        names = ['loss', 'loss_rpn_cls', 'loss_rpn_box', 'loss_rcnn_cls', 'loss_rcnn_box']
+                    write_scalars(writer, scalars, names, iters_per_epoch * (epoch - 1) + step, tag='train_loss')
+                '''
+                loss_temp = 0
+                start = time.time()
+        
+        
+        if args.mGPUs:
+            save_name = os.path.join(output_dir, 'fpn_{}_{}_{}.pth'.format(args.session, epoch, step))
+            save_checkpoint({
+                'session': args.session,
+                'epoch': epoch + 1,
+                'model': model.module.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'pooling_mode': cfg.POOLING_MODE,
+                'class_agnostic': args.class_agnostic,
+            }, save_name)
+        else:
+            save_name = os.path.join(output_dir, 'fpn_{}_{}_{}.pth'.format(args.session, epoch, step))
+            save_checkpoint({
+                'session': args.session,
+                'epoch': epoch + 1,
+                'model': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'pooling_mode': cfg.POOLING_MODE,
+                'class_agnostic': args.class_agnostic,
+            }, save_name)
+        _print('save model: {}'.format(save_name), )
+        
         end = time.time()
         print(end - start)
     

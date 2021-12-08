@@ -13,6 +13,9 @@ from easydict import EasyDict as edict
 __C = edict()
 cfg = __C
 
+__C.NCLASSES = 2
+
+
 __C.TRAIN = edict()
 
 # Original image size

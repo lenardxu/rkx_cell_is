@@ -30,3 +30,6 @@ def _smooth_l1_loss(bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_w
     #   loss_box = loss_box.sum(i)
     # loss_box = loss_box.mean()
     return loss_box
+
+def save_checkpoint(state, filename):
+    torch.save(state, filename)
