@@ -21,6 +21,7 @@ from roi_data_layer.roidb import combined_roidb
 from roi_data_layer.roibatchLoader import sampler, roibatchLoader
 from model.utils.config import cfg, cfg_from_file, cfg_from_list
 #from model.utils.net_utils import adjust_learning_rate, save_checkpoint
+from utils.data_loader_tests import print_out_info_of_dl
 
 # "tensorboardX" is an alternative to the official one "torch.utils.tensorboard", which BTY still requires installation
 from tensorboardX import SummaryWriter
@@ -66,7 +67,7 @@ def parse_args():
                         help='directory to save models', default="../results/models", )
     parser.add_argument('--nw', dest='num_workers',
                         help='number of worker to load data',
-                        default=0, type=int)
+                        default=1, type=int)
     parser.add_argument('--cuda', dest='cuda',
                         help='whether use CUDA',
                         action='store_true')
@@ -199,18 +200,22 @@ if __name__ == '__main__':
         batch_sampler = torch.utils.data.sampler.BatchSampler(
             single_batch_sampler, args.batch_size, drop_last=False
         )
-        # Currently, the args.batch_size does not work as expected, i.e. the single sample as batch is executed
+        # In the early code, the args.batch_size did not work as expected, i.e. the single sample as batch was executed
         # no matter how much args.batch_size takes. Hence, the batch_sampler is inserted here for dataloader.
         dataset = roibatchLoader(imdb, roidb, ratio_list, ratio_index, args.batch_size,
                                  imdb.num_classes, training=True)
         dataloader = torch.utils.data.DataLoader(dataset,
                                                  batch_sampler=batch_sampler,
                                                  num_workers=args.num_workers)
+        #!! SHAPE of each: (2, 3, h, w), (2,3), (2, 20, 5), (2, h, w, 20), (2,), (2,) if arg.batch_size is set as 2!
 
 
         # validation set
         cfg.TRAIN.USE_FLIPPED = False
+        print('Start combining roidbs...')
+        tic_cb = time.time()
         val_imdb, val_roidb, val_ratio_list, val_ratio_index = combined_roidb(args.imdbval_name)
+        print(('Done by combining (t={:0.2f}s)'.format(time.time() - tic_cb)))
         val_size = len(val_roidb)
         _print('{:d} validation roidb entries'.format(val_size))
         val_single_batch_sampler = sampler(val_size, args.val_batch_size)
@@ -221,11 +226,21 @@ if __name__ == '__main__':
         #       - no data augmentation is applied
         #       - only one (not two or more) image per batch (per gpu if any) for validation
         #       - shuffle is not adopted when distributed computing is off
+        print('Start buidling val dataset object...')
+        tic_ds = time.time()
         val_dataset = roibatchLoader(val_imdb, val_roidb, val_ratio_list, val_ratio_index,
                                      args.val_batch_size, val_imdb.num_classes, training=True)
+        print(('Done by val ds (t={:0.2f}s)'.format(time.time() - tic_ds)))
+        print('Start buidling val dataloader object...')
+        tic_dl = time.time()
         val_dataloader = torch.utils.data.DataLoader(val_dataset,
                                                      batch_sampler=val_batch_sampler,
                                                      num_workers=args.num_workers)
+        print(('Done by val dl (t={:0.2f}s)'.format(time.time() - tic_dl)))
+
+        # print out the results of dataset and dataloader for validation
+        print_out_info_of_dl(val_dataset, val_dataloader, mode='val')
+
     else:
         # set up the data preprocessing for anchor-free model
         pass

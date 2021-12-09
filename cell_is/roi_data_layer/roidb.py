@@ -158,13 +158,14 @@ def combined_roidb(imdb_names, training=True):
     return imdb, roidb, ratio_list, ratio_index
 
 if __name__ == '__main__':
-    ut_imdbval_name = "livecell_coco_val"
-    ut_imdb, ut_roidb, ut_ratio_list, ut_ratio_index = combined_roidb(ut_imdbval_name)
+    import sys
+    ut_imdb_name = "livecell_coco_val"
+    ut_imdb, ut_roidb, ut_ratio_list, ut_ratio_index = combined_roidb(ut_imdb_name)
     for k, j in enumerate(ut_ratio_index):
         if j == 149:
             print(k)
             break
-    print('roidb', ut_roidb[149])
+    print(f'the size of ut_roidb is: {sys.getsizeof(ut_roidb) / (1024**2)} Mb')
     # print(dataset[k][1])
     # print('--------')
     # print(dataset[k][2], dataset[k][3], dataset[k][4])

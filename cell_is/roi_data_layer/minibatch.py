@@ -55,13 +55,13 @@ def get_minibatch(imdb, roidb, num_classes):
         bboxes.append(bbox)
         gt_classes.append(cls)
         overlaps.append(roidb[0]['gt_overlaps'][ix])
-        seg_areas.append(roidb[0]['area'][ix])
-    del roidb[0]['segmentation']
+        seg_areas.append(roidb[0]['seg_areas'][ix])
+    #del roidb[0]['segmentation']
     roidb[0]['boxes'] = np.stack(bboxes, axis=0).astype(np.uint16)
     roidb[0]['mask'] = np.stack(instance_masks, axis=2).astype(np.bool)
     roidb[0]['gt_classes'] = np.asarray(gt_classes, dtype=np.int32)
     roidb[0]['gt_overlaps'] = np.stack(overlaps, axis=0).astype(np.float32)
-    roidb[0]['area'] = np.asarray(seg_areas, dtype=np.float32)
+    roidb[0]['seg_areas'] = np.asarray(seg_areas, dtype=np.float32)
 
     # Sample random scales to use for each image in this batch
     # XU: return np.ndarray of shape (num_images,) with int number uniformly sampled from [0,len(cfg.TRAIN.SCALES))

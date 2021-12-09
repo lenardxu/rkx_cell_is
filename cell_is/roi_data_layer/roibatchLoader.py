@@ -236,7 +236,7 @@ class roibatchLoader(data.Dataset):
                                             self.max_num_box).zero_()  # shape: (h, w, self.max_num_box)
         if keep.numel() != 0:
             gt_boxes = gt_boxes[keep]
-            gt_masks = gt_masks[keep]
+            gt_masks = gt_masks[:, :, keep]
             num_boxes = min(gt_boxes.size(0), self.max_num_box)
             gt_boxes_padding[:num_boxes, :] = gt_boxes[:num_boxes]  # shape: (self.max_num_box, 5)
             gt_masks_padding[:, :, :num_boxes] = gt_masks[:, :, :num_boxes]  # shape: (h, w, self.max_num_box)
@@ -246,7 +246,6 @@ class roibatchLoader(data.Dataset):
         # permute trim_data to adapt to downstream processing
         padding_data = padding_data.permute(2, 0, 1).contiguous()  # shape: (3, h, w)
         im_info = im_info.view(3)  # shape: (3,)
-
         return padding_data, im_info, gt_boxes_padding, gt_masks_padding, num_boxes, blobs['img_id']
     else:
         data = data.permute(0, 3, 1, 2).contiguous().view(3, data_height, data_width)

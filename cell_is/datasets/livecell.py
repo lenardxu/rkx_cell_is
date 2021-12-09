@@ -202,7 +202,8 @@ class livecell(imdb):
       else:
         overlaps[ix, cls] = 1.0
 
-    # XU: return the list of key's (clean_seg) values, each standing for [[...]] (polygon-based)
+    # XU: obj['clean_seg'] stands for [[...]] (polygon-based)
+    # XU: return the list of
     segmentation = [obj['clean_seg'] for obj in objs]
     # validate all the elements of boxes
     ds_utils.validate_boxes(boxes, width=width, height=height)
