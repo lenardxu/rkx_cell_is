@@ -16,6 +16,7 @@ import json
 import uuid
 from collections import defaultdict
 import time
+import matplotlib.pyplot as plt
 # COCO API
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
