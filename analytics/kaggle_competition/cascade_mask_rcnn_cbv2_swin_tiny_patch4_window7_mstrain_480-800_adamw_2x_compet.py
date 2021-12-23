@@ -148,8 +148,8 @@ data = dict(samples_per_gpu=samples_per_gpu,
 dataset_type = 'CocoDataset'
 data_root = '../data/livecell_images'
 
-runner = dict(max_epochs=12)
-lr_config = dict(step=[8,11])
+runner = dict(max_epochs=24)
+lr_config = dict(step=[16,22])
 optimizer = dict(lr=0.00005)
 load_from = './live_version1/latest.pth'
 
