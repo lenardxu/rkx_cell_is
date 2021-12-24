@@ -2,13 +2,35 @@ _base_ = [
     '../swin/cascade_mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_giou_4conv1f_adamw_3x_coco.py'
 ]
 
+# TODO Multi-scale should be adopted! -> shortest side set to one of (440, 480, 520, 580, 620) pixels
+# TODO the predefined anchor box sizes were reduced to (4, 9, 17, 31, 64, 127 pixels)
+# TODO the anchor generator aspect ratios are changed to (0.25, 0.5, 1, 2, 4)
 model = dict(
     backbone=dict(
         type='CBSwinTransformer',
     ),
     neck=dict(
         type='CBFPN',
+        in_channels=[96, 192, 384, 768],
+        out_channels=256,
+        num_outs=5
     ),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[1],
+            ratios=[0.25, 0.5, 1.0, 2.0, 4.0],
+            strides=[8, 16, 32, 64, 128]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[.0, .0, .0, .0],
+            target_stds=[1.0, 1.0, 1.0, 1.0]),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(type='SmoothL1Loss', beta=1.0 / 9.0, loss_weight=1.0)),
     test_cfg = dict(
         rcnn=dict(
             score_thr=0.001,
@@ -86,24 +108,26 @@ model = dict(
         ]
    )
 )
-
+# TODO normalization parameters should be changed!
 img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+    mean=[128.0, 128.0, 128.0], std=[11.58, 11.58, 11.58], to_rgb=True)
 
 # augmentation strategy originates from HTC
-
+# (440, 480, 520, 580, 620)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Resize',
-         img_scale=(520,704),
+         img_scale=[(440,600),(480,650),(520,704),(580,800),(620,850)],
+         multiscale_mode='value',
          keep_ratio=True),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks']),
 ]
+
 test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
@@ -120,9 +144,9 @@ test_pipeline = [
         ])
 ]
 
-samples_per_gpu=1
+samples_per_gpu=2
 data = dict(samples_per_gpu=samples_per_gpu,
-            workers_per_gpu=1,
+            workers_per_gpu=2,
             train=dict(
                 type='CocoDataset',
                 pipeline=train_pipeline,
