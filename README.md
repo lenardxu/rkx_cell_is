@@ -1,6 +1,4 @@
 # Cell Instance Segmentation
-===========
-
 This repo is dedicated for the Kaggle challenge - 
 [sartorious cell instance segmentation](https://www.kaggle.com/c/sartorius-cell-instance-segmentation/overview/description).
 It majorly leverages [MMDetection](https://github.com/open-mmlab/mmdetection) for training the instance segmentation model.
@@ -93,16 +91,5 @@ undisclosed test data of Sartorius.
 Every experiment has a unique **name**.
 This name is defined by the experiment and should be used to create corresponding sub folders in the global `results`.
 They need to follow this structure `<NAME>/YYYY-MM-DD_hh:mm:ss/` to store results and/or figures.
-
-A best practice is to check in only the result (e.g. as pickle) and afterwards create figures for interpretation in the notebooks.
-
-
-- Submissions to this competition must be made through Notebooks.
-- In order for the "Submit" button to be active after a commit, the following conditions must be met:
-  - CPU Notebook <= 9 hours run-time
-  - GPU Notebook <= 9 hours run-time
-  - Internet access disabled
-  - Freely & publicly available external data is allowed, including pre-trained models
-  - Submission file must be named `submission.csv`
   
   
